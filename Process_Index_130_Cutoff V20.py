@@ -5,15 +5,15 @@ import numpy as np
 import pandasql
 from pandasql import sqldf
 
-InfoCode = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\Size Labelling\InfoCode.csv", parse_dates=["vf", "vt"])
+InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
 InfoCode["vt"] = InfoCode["vt"].replace("99991230", "21001230")
 # Convert columns into DateTime
 InfoCode["vt"] = pd.to_datetime(InfoCode["vt"], format = "%Y%m%d")
 # Infocode = InfoCode.loc[InfoCode.groupby("StoxxId")["vt"].idxmax()]
 
-Dates_Frame = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-MAR-SEP.csv", index_col=0, parse_dates=["Review", "Cutoff"])
-Dates_Frame_JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-JUN-DEC.csv", index_col=0, parse_dates=["Review", "Cutoff"])
+Dates_Frame = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", index_col=0, parse_dates=["Review", "Cutoff"])
+Dates_Frame_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", index_col=0, parse_dates=["Review", "Cutoff"])
 
 # Concat the two Review Frames
 Dates_Frame = pd.concat([Dates_Frame, Dates_Frame_JUNDEC]).sort_values(by="Review").reset_index(inplace=False).drop(columns={"index"})
@@ -21,10 +21,10 @@ Dates_Frame = pd.concat([Dates_Frame, Dates_Frame_JUNDEC]).sort_values(by="Revie
 Cleaned_Frame = pd.DataFrame()
 
 # Read CSV file, parse dates, handle NA values, drop rows with NA, and specify dtype
-Input = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Universe\SWESCGV_MARSEP.csv",
+Input = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_MARSEP.csv",
                     index_col=0, parse_dates=["Date", "Cutoff"])
     
-Input_JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Universe\SWESCGV_JUNDEC.csv",
+Input_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_JUNDEC.csv",
                     parse_dates=["Date", "Cutoff"], index_col=0)
 
 # Add information of InfoCode
@@ -57,14 +57,14 @@ Input = Input.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCo
 Input = Input.dropna(subset="InfoCode")
 
 # Read CSV file for Cutoff dates (Market Cap)
-Securities_Cutoff_MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW.csv",
+Securities_Cutoff_MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW.csv",
                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
                                                                                                         "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
                                                                                                         "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
                                        
 Securities_Cutoff_MARSEP = Securities_Cutoff_MARSEP.dropna(subset=["stoxxId_Cutoff"])
                                        
-Securities_Cutoff_JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW.csv",
+Securities_Cutoff_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW.csv",
                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
                                                                                                         "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
                                                                                                         "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
@@ -74,9 +74,9 @@ Securities_Cutoff_JUNDEC = Securities_Cutoff_JUNDEC.dropna(subset=["stoxxId_Cuto
 Securities_Cutoff = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_JUNDEC])
 
 # Read CSV files for Turnover
-Turnover = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Turnover\Output_Turnover_Cutoff_3M_MARSEP.csv", 
+Turnover = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_MARSEP.csv", 
                     parse_dates=["Date"], dtype={"InfoCode": "int64"})
-Turnover_JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Turnover\Output_Turnover_Cutoff_3M_JUNDEC.csv",
+Turnover_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_JUNDEC.csv",
                     parse_dates=["Date"], dtype={"InfoCode": "int64"})
 
 # Merget the two Frame with Turnoveru
@@ -114,7 +114,7 @@ Input = pd.concat([Input, Input_JUNDEC], ignore_index=True).sort_values(by="Date
 Input["Turnover_Ratio"] = Input["Turnover_Ratio"].fillna(0)
 
 # Add FX_Rate as of Cutoff
-FX_Rate = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\FX\FX_Historical_UPDATE.csv", index_col=0, parse_dates=["cutoff_date"])
+FX_Rate = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\FX\FX_Historical_UPDATE.csv", index_col=0, parse_dates=["cutoff_date"])
 Input = Input.merge(FX_Rate, left_on=["Cutoff", "Currency"], right_on=["cutoff_date", "frm_currency"]).drop(columns={"frm_currency", 
                             "to_currency", "cutoff_date"}).rename(columns={"exchange_rate": "FX_Rate_Cutoff"})
 
@@ -271,7 +271,7 @@ Output[[
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF"
-]].to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Output\Final_Buffer_V" + str(Version) + ".csv")
+]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V" + str(Version) + ".csv")
 
 FOR_Removed[[
     "Date",
@@ -292,4 +292,4 @@ FOR_Removed[[
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF"
-]].to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Output\Final_Buffer_V" + str(Version) + "_FOR_Removed_Securities.csv")
+]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V" + str(Version) + "_FOR_Removed_Securities.csv")
