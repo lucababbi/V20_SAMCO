@@ -23,9 +23,13 @@ Cleaned_Frame = pd.DataFrame()
 # Read CSV file, parse dates, handle NA values, drop rows with NA, and specify dtype
 Input = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_MARSEP.csv",
                     index_col=0, parse_dates=["Date", "Cutoff"])
+
+Input = Input.query("Mcap_Units_Index_Currency > 0")
     
 Input_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_JUNDEC.csv",
                     parse_dates=["Date", "Cutoff"], index_col=0)
+
+Input_JUNDEC = Input_JUNDEC.query("Mcap_Units_Index_Currency > 0")
 
 # Add information of InfoCode
 Input_JUNDEC = sqldf("""
