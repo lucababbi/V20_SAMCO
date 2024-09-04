@@ -321,6 +321,8 @@ Output[[
     "InfoCode",
     "closePrice_Cutoff",
     "freeFloat_Cutoff",
+    "Free_Float",
+    "Capfactor",
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF"
@@ -341,6 +343,8 @@ FOR_Removed[[
     "InfoCode",
     "closePrice_Cutoff",
     "freeFloat_Cutoff",
+    "Free_Float",
+    "Capfactor",
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF",

@@ -149,7 +149,7 @@ for date in Dates_Frame.Review:
     # Pick the smallest 35% for each Country
     for country in temp_Input.Country.unique():
         country_Input = temp_Input.query("Country == @country")
-        country_Input["Weight"] = country_Input["Free_Float_Market_Cutoff"] / country_Input["Free_Float_Market_Cutoff"].sum()
+        country_Input["Weight"] = country_Input["Full_Market_Cap_Cutoff"] / country_Input["Full_Market_Cap_Cutoff"].sum()
         country_Input = country_Input.sort_values(by="Weight", ascending=False)
         country_Input["CumulativeWeightCutoff"] = country_Input["Weight"].cumsum()
 
@@ -175,8 +175,11 @@ for date in Input_V20.Date.unique():
                                 "ICB",
                                 "Mcap_Units_Index_Currency",
                                 "InfoCode",
-                                "closePrice_Cutoff",
+                                "Close_USD_Cutoff",
+                                "shares_Cutoff",
                                 "freeFloat_Cutoff",
+                                "Free_Float",
+                                "Capfactor",
                                 "Free_Float_Market_Cutoff",
                                 "Full_Market_Cap_Cutoff",
                                 "FOR_FF"
@@ -195,15 +198,18 @@ for date in Input_V20.Date.unique():
                                 "ICB",
                                 "Mcap_Units_Index_Currency",
                                 "InfoCode",
-                                "closePrice_Cutoff",
+                                "Close_USD_Cutoff",
+                                "shares_Cutoff",
                                 "freeFloat_Cutoff",
+                                "Free_Float",
+                                "Capfactor",
                                 "Free_Float_Market_Cutoff",
                                 "Full_Market_Cap_Cutoff",
                                 "FOR_FF"
                             ]]
     
     # Recalculate the Weight
-    temp_Input_V20["Weight"] = temp_Input_V20["Free_Float_Market_Cutoff"] / temp_Input_V20["Free_Float_Market_Cutoff"].sum() 
+    temp_Input_V20["Weight"] = temp_Input_V20["Full_Market_Cap_Cutoff"] / temp_Input_V20["Full_Market_Cap_Cutoff"].sum() 
 
     # Drop as many rows as temp_Output
     temp_Input_V20 = temp_Input_V20.sort_values(by="Weight", ascending=False)
@@ -216,3 +222,4 @@ for date in Input_V20.Date.unique():
     Final_Frame = pd.concat([Final_Frame, temp_Final_Frame])
 
 Final_Frame.to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2.csv")
+Final_Frame.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC.csv")

@@ -17,6 +17,7 @@ Dates_Frame_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projec
 
 # Concat the two Review Frames
 Dates_Frame = pd.concat([Dates_Frame, Dates_Frame_JUNDEC]).sort_values(by="Review").reset_index(inplace=False).drop(columns={"index"})
+Dates_Frame = Dates_Frame.head(len(Dates_Frame) - 2)
 
 Cleaned_Frame = pd.DataFrame()
 
@@ -270,8 +271,11 @@ Output[[
     "ICB",
     "Mcap_Units_Index_Currency",
     "InfoCode",
-    "closePrice_Cutoff",
+    "Close_USD_Cutoff",
+    "shares_Cutoff",
     "freeFloat_Cutoff",
+    "Free_Float",
+    "Capfactor",
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF"
@@ -291,8 +295,11 @@ FOR_Removed[[
     "ICB",
     "Mcap_Units_Index_Currency",
     "InfoCode",
-    "closePrice_Cutoff",
+    "Close_USD_Cutoff",
+    "shares_Cutoff",
     "freeFloat_Cutoff",
+    "Free_Float",
+    "Capfactor",
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF",
