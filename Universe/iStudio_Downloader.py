@@ -4,7 +4,8 @@ from urllib3 import exceptions, disable_warnings
 import datetime
 disable_warnings(exceptions.InsecureRequestWarning)
 
-date_ranges =  pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-JUN-DEC.csv", index_col=0)
+date_ranges =  pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", index_col=0)
+date_ranges = date_ranges.tail(2)
 dates = []
  
 for i in date_ranges["Review"]:

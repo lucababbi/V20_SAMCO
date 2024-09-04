@@ -10,7 +10,7 @@ from requests.auth import HTTPBasicAuth
 import calendar
 from dateutil.relativedelta import relativedelta
 import sys
-sys.path.append(r"C:\Users\et246\Desktop\stoxx-world-msci\Size Labelling\STOXX")
+sys.path.append(r"C:\Users\et246\Desktop\V20_SAMCO\STOXX")
 import stoxx
 
 def get_prod_comp(symbol, date_i, oc):
@@ -143,7 +143,7 @@ def get_last_business_day_of_month(date):
 
     return EOM
 
-idx = "SWEMCGV" 
+idx = "SWESCGV" 
 opclo = "close"
 
 # Create DataFrame with Review and Cutoff dates
