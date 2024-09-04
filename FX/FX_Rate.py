@@ -3,8 +3,8 @@ import requests
 import datetime
 from datetime import datetime, timedelta, date
 
-MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-MAR-SEP.csv", index_col=0, parse_dates=["Review", "Cutoff"])
-JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-JUN-DEC.csv", index_col=0, parse_dates=["Review", "Cutoff"])
+MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", index_col=0, parse_dates=["Review", "Cutoff"]).tail(1)
+JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", index_col=0, parse_dates=["Review", "Cutoff"]).tail(1)
 
 Dates = pd.concat([MARSEP, JUNDEC]).sort_values(by=["Review"])
 Currency = ["KRW", "MYR", "HKD", "TWD", "ILS", "EUR", "PHP", "THB", "USD", "CLP", "MXN", "ZAR", "EGP", 
@@ -34,4 +34,4 @@ for Cutoff in Dates["Cutoff"]:
             Historical_FX = pd.concat([Historical_FX, FX])
 
 print(Historical_FX)
-Historical_FX = Historical_FX.to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\FX\FX_Historical_UPDATE.csv")
+Historical_FX = Historical_FX.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\FX\FX_Historical_UPDATE_2024.csv")

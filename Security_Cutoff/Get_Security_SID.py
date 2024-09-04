@@ -2,7 +2,7 @@ from logging import Formatter
 from multiprocessing import connection
 from sqlite3 import Cursor, connect
 import sys
-sys.path.append(r"C:\Users\et246\Desktop\stoxx-world-msci\Size Labelling\STOXX")
+sys.path.append(r"C:\Users\et246\Desktop\V20_SAMCO\STOXX")
 import pandas as pd
 import numpy as np
 import datetime as dt
@@ -38,8 +38,8 @@ try:
 except OperationalError as e:
     print("Connection failed:", e)
 
-MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"])
-JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"])
+MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"]).tail(1)
+JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"]).tail(1)
 
 Output = pd.DataFrame()
 CapFactor = pd.DataFrame()
@@ -247,7 +247,7 @@ for date in MARSEP["Cutoff"]:
         Output = pd.concat([Output, temp])
 
 Output = Output.drop_duplicates(subset=["validDate", "stoxxId"])
-Output.to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW.csv")
+Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW_2024.csv")
 
 # Reset the Frame
 Output = pd.DataFrame()
@@ -328,4 +328,4 @@ for date in JUNDEC["Cutoff"]:
         Output = pd.concat([Output, temp])
 
 Output = Output.drop_duplicates(subset=["validDate", "stoxxId"])
-Output.to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW.csv")
+Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW_2024.csv")

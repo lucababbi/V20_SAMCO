@@ -4,12 +4,16 @@ from urllib3 import exceptions, disable_warnings
 import datetime
 disable_warnings(exceptions.InsecureRequestWarning)
 
-date_ranges =  pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", index_col=0)
-date_ranges = date_ranges.tail(2)
+date_ranges =  pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", index_col=0)
+date_ranges = date_ranges.tail(1)
 dates = []
  
 for i in date_ranges["Review"]:
-    dates.append(datetime.datetime.strptime(i, '%Y-%m-%d'))
+    try:
+        dates.append(datetime.datetime.strptime(i, '%Y-%m-%d'))
+    except:
+        dates.append(datetime.datetime.strptime(i, '%m/%d/%Y'))
+
 
 header = {
     "Content-Type": "application/json",
@@ -65,4 +69,4 @@ composition = composition.drop(columns={"next_trading_day", "currency_next_day",
                                         "shares_next_day", "free_float_next_day", "cap_factor_next_day_cf", "weight_factor_next_day_wf", "adjusted_local",
                                         "adjusted_mcap_units_local", "adjusted_mcap_units_index_currency"})
 
-composition.to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Universe\SWESCGV_JUNDEC_Pre_Review.csv")#
+composition.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\SWESCGV_JUNDEC_2024.csv")

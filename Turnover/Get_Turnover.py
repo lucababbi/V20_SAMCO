@@ -1,6 +1,6 @@
 from sqlite3 import Date
 import sys
-sys.path.append(r"C:\Users\et246\Desktop\stoxx-world-msci\Size Labelling\STOXX")
+sys.path.append(r"C:\Users\et246\Desktop\V20_SAMCO\STOXX")
 import pandas as pd
 from datetime import datetime
 from stoxx.qad.Turnover_Code import get_turnover_ratio
@@ -8,7 +8,7 @@ from stoxx.qad.identifier import get_infocode
 
 Output_Turnover = pd.DataFrame()
 
-InfoCode = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\Size Labelling\InfoCode.csv", parse_dates=["vt"])
+InfoCode = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\InfoCode.csv", parse_dates=["vt"])
 # Deal with 99991230 dates with a date in remote future
 InfoCode["vt"] = InfoCode["vt"].replace("99991230", "21001230")
 # Convert columns into DateTime
@@ -16,17 +16,17 @@ InfoCode["vt"] = pd.to_datetime(InfoCode["vt"], format = "%Y%m%d")
 Infocode = InfoCode.loc[InfoCode.groupby("StoxxId")["vt"].idxmax()]
 
 # Get the Universe at Review Dates
-Output_JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Universe\SWESCGV_JUNDEC.csv", index_col=0, parse_dates=["Date", "Cutoff"])
-Output_MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Universe\SWESCGV_MARSEP.csv", index_col=0, parse_dates=["Date", "Cutoff"])
+Output_JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\SWESCGV_JUNDEC_2024.csv", index_col=0, parse_dates=["Date", "Cutoff"])
+Output_MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\SWESCGV_MARSEP_2024.csv", index_col=0, parse_dates=["Date", "Cutoff"])
 
 Output_JUNDEC = Output_JUNDEC.merge(Infocode[["StoxxId", "InfoCode"]], left_on="Internal_Number", right_on="StoxxId", how="left").drop(columns={"StoxxId"})
 Output_MARSEP = Output_MARSEP.merge(Infocode[["StoxxId", "InfoCode"]], left_on="Internal_Number", right_on="StoxxId", how="left").drop(columns={"StoxxId"})
 
 # Get Dates Frame
-Dates_FrameJUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-JUN-DEC.csv", index_col=0, 
-                        parse_dates=["Cutoff", "Review"])
-Dates_FrameMARSEP = pd.read_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Dates\Review_Date-MAR-SEP.csv", index_col=0, 
-                        parse_dates=["Cutoff", "Review"])
+Dates_FrameJUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", index_col=0, 
+                        parse_dates=["Cutoff", "Review"]).tail(1)
+Dates_FrameMARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", index_col=0, 
+                        parse_dates=["Cutoff", "Review"]).tail(1)
 
 # Drop SEDOL
 Output_JUNDEC = Output_JUNDEC.dropna(subset=["SEDOL", "InfoCode"])
@@ -72,7 +72,7 @@ for date in Dates_FrameMARSEP["Review"]:
     Output_Turnover = pd.concat([Output_Turnover, AA])
     print(date)
 
-Output_Turnover.to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Turnover\Output_Turnover_Cutoff_3M_MARSEP.csv")
+Output_Turnover.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_MARSEP_2024.csv")
 
 # Reset the DataFrame
 Output_Turnover = pd.DataFrame()
@@ -89,4 +89,4 @@ for date in Dates_FrameJUNDEC["Review"]:
     Output_Turnover = pd.concat([Output_Turnover, AA])
     print(date)
 
-Output_Turnover.to_csv(r"C:\Users\et246\Desktop\stoxx-world-msci\V18\Turnover\Output_Turnover_Cutoff_3M_JUNDEC.csv")
+Output_Turnover.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_JUNDEC_2024.csv")
