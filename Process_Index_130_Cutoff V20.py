@@ -291,5 +291,6 @@ FOR_Removed[[
     "freeFloat_Cutoff",
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
-    "FOR_FF"
+    "FOR_FF",
+    "Weight"
 ]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V" + str(Version) + "_FOR_Removed_Securities.csv")
