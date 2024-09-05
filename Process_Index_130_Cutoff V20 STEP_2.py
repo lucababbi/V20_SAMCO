@@ -26,6 +26,11 @@ Dates_Frame = pd.concat([Dates_Frame, Dates_Frame_JUNDEC]).sort_values(by="Revie
 
 Final_Frame = pd.DataFrame()
 
+# Read Input from SWACALLCAP
+MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWACALLCAP_MARSEP_OPEN.csv", parse_dates=["Date"], index_col=0)
+JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWACALLCAP_JUNDEC_OPEN.csv", parse_dates=["Date"], index_col=0)
+SWACALLCAP = pd.concat([MARSEP, JUNDEC]).rename(columns={"Mcap_Units_Index_Currency": "Mcap_Units_Index_Currency_Open"})
+
 # Read CSV file, parse dates, handle NA values, drop rows with NA, and specify dtype
 
 # MID Cap Universe
@@ -193,9 +198,9 @@ else:
 # Foreign Ownership Restriction adjusted Free Float Market Cap
 Input["FOR_FF"] = Input["Free_Float"] * Input["Capfactor"]
 
-# Filter for Date MAR2010
-Input = Input.query("Date >= '2010-03-22'")
-Dates_Frame = Dates_Frame.query("Review >= '2010-03-22'")
+# Filter for Date MAR2019
+Input = Input.query("Date >= '2019-03-18'")
+Dates_Frame = Dates_Frame.query("Review >= '2019-03-18'")
 
 # Loop MID Cap
 for date in Dates_Frame.Review:
@@ -216,8 +221,8 @@ for date in Dates_Frame.Review:
 Output["Source"] = "MID Cap Index"
 
 # Load initial setup V20
-Input_V20 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced.csv", parse_dates=["Date"], index_col=0)
-Input_V20 = Input_V20.query("Date >= '2010-03-22'")
+Input_V20 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced_2024.csv", parse_dates=["Date"], index_col=0)
+Input_V20 = Input_V20.query("Date >= '2019-03-18'")
 Input_V20["Source"] = "SMALL Cap Index"
 
 for date in Input_V20.Date.unique():
@@ -332,14 +337,18 @@ for date in Input_V20.Date.unique():
     temp_Input_V20 = temp_Input_V20.head(len(temp_Input_V20) - len(temp_Output))
 
     temp_Final_Frame = pd.concat([temp_Input_V20, temp_Output])
-    temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency"] / temp_Final_Frame["Mcap_Units_Index_Currency"].sum()
+
+    # Add MCAP_UNITS_OPEN from SW_ACALLCAP
+    temp_Final_Frame = temp_Final_Frame.merge(SWACALLCAP, on=["Date", "Internal_Number"], how="left")
+
+    temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency_Open"] / temp_Final_Frame["Mcap_Units_Index_Currency_Open"].sum()
     temp_Final_Frame["Index_Component_Count"] = len(temp_Final_Frame)
 
     Final_Frame = pd.concat([Final_Frame, temp_Final_Frame])
     Removed_Securities = pd.concat([Removed_Securities, temp_Removed_Securities])
     Added_Securities = pd.concat([Added_Securities, temp_Output])
 
-Final_Frame.to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2.csv")
-Final_Frame.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC.csv")
-Removed_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Removed_Securities_STEP2_OPEN_2023_DEC.csv")
-Added_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Added_Securities_2023_DEC.csv")
+Final_Frame.to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2024.csv")
+Final_Frame.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC.csv")
+Removed_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Removed_Securities_STEP2_OPEN_2023_DEC.csv")
+Added_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Added_Securities_2023_DEC.csv")
