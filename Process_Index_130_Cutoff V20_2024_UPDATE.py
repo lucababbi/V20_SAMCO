@@ -5,7 +5,7 @@ import numpy as np
 import pandasql
 from pandasql import sqldf
 
-InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode_2024.csv", parse_dates=["vf", "vt"])
+InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
 InfoCode["vt"] = InfoCode["vt"].replace("99991230", "21001230")
 # Convert columns into DateTime
@@ -319,7 +319,8 @@ Output[[
     "ICB",
     "Mcap_Units_Index_Currency",
     "InfoCode",
-    "closePrice_Cutoff",
+    "Close_USD_Cutoff",
+    "shares_Cutoff",
     "freeFloat_Cutoff",
     "Free_Float",
     "Capfactor",
@@ -341,7 +342,8 @@ FOR_Removed[[
     "ICB",
     "Mcap_Units_Index_Currency",
     "InfoCode",
-    "closePrice_Cutoff",
+    "Close_USD_Cutoff",
+    "shares_Cutoff",
     "freeFloat_Cutoff",
     "Free_Float",
     "Capfactor",
