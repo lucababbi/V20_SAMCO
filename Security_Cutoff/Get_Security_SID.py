@@ -38,8 +38,8 @@ try:
 except OperationalError as e:
     print("Connection failed:", e)
 
-MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"]).tail(1)
-JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"]).tail(1)
+MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"])
+JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"])
 
 Output = pd.DataFrame()
 CapFactor = pd.DataFrame()
@@ -208,7 +208,7 @@ for date in MARSEP["Cutoff"]:
 
         # Fetch the results and convert to DataFrame
         temp = pd.DataFrame(result.fetchall())
-        temp = temp.drop(columns={"adjustedOpenPrice", "adjustedOpenNet", "adjustedOpenGross", "adjustmentFactor"})
+        # temp = temp.drop(columns={"adjustedOpenPrice", "adjustedOpenNet", "adjustedOpenGross", "adjustmentFactor"})
 
         # Add CapFactor information
         sSQL = """
@@ -247,7 +247,7 @@ for date in MARSEP["Cutoff"]:
         Output = pd.concat([Output, temp])
 
 Output = Output.drop_duplicates(subset=["validDate", "stoxxId"])
-Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW_2024.csv")
+Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW_OPEN.csv")
 
 # Reset the Frame
 Output = pd.DataFrame()
@@ -289,7 +289,7 @@ for date in JUNDEC["Cutoff"]:
 
         # Fetch the results and convert to DataFrame
         temp = pd.DataFrame(result.fetchall())
-        temp = temp.drop(columns={"adjustedOpenPrice", "adjustedOpenNet", "adjustedOpenGross", "adjustmentFactor"})
+        # temp = temp.drop(columns={"adjustedOpenPrice", "adjustedOpenNet", "adjustedOpenGross", "adjustmentFactor"})
 
         # Add CapFactor information
         sSQL = """
@@ -328,4 +328,4 @@ for date in JUNDEC["Cutoff"]:
         Output = pd.concat([Output, temp])
 
 Output = Output.drop_duplicates(subset=["validDate", "stoxxId"])
-Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW_2024.csv")
+Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW_OPEN.csv")
