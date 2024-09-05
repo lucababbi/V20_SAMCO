@@ -341,6 +341,10 @@ for date in Input_V20.Date.unique():
     # Add MCAP_UNITS_OPEN from SW_ACALLCAP
     temp_Final_Frame = temp_Final_Frame.merge(SWACALLCAP, on=["Date", "Internal_Number"], how="left")
 
+    # Check if any securities do not have information
+    if temp_Final_Frame['Mcap_Units_Index_Currency_Open'].isnull().any():
+        print("There are empty (NaN) values in the column 'Mcap_Units_Index_Currency_Open'")
+
     temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency_Open"] / temp_Final_Frame["Mcap_Units_Index_Currency_Open"].sum()
     temp_Final_Frame["Index_Component_Count"] = len(temp_Final_Frame)
 
