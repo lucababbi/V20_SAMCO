@@ -147,7 +147,7 @@ idx = "STXWAGV"
 opclo = "open"
 
 # Create DataFrame with Review and Cutoff dates
-Review_Date = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"])
+Review_Date = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"])
 Output = pd.DataFrame()
 
 for date in Review_Date["Review"]:
@@ -157,4 +157,5 @@ for date in Review_Date["Review"]:
     Output = pd.concat((Output, cons))
     print(Output)
 
-Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\SWACALLCAP_MARSEP.csv")
+Output = Output[["Date", "Internal_Number", "Mcap_Units_Index_Currency"]]
+Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\SWACALLCAP_JUNDEC.csv")
