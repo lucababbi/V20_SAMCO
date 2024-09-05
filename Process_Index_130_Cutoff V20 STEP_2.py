@@ -5,6 +5,11 @@ import numpy as np
 import pandasql
 from pandasql import sqldf
 
+# ================================================
+#              Open -  Close Price
+# ================================================
+Price = "Open"
+
 InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
 InfoCode["vt"] = InfoCode["vt"].replace("99991230", "21001230")
@@ -54,22 +59,47 @@ MID_JUNDEC["Date"] = pd.to_datetime(MID_JUNDEC["Date"])
 MID_JUNDEC = MID_JUNDEC.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCodeSource", "vf", "vt", "SecId","Sedol6", "Isin", "Ric"})
 MID_JUNDEC = MID_JUNDEC.dropna(subset="InfoCode")
 
-# Read CSV file for Cutoff dates (Market Cap)
-Securities_Cutoff_MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW.csv",
-                                       sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
-                                                                                                        "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
-                                                                                                        "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
-                                       
-Securities_Cutoff_MARSEP = Securities_Cutoff_MARSEP.dropna(subset=["stoxxId_Cutoff"])
-                                       
-Securities_Cutoff_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW.csv",
-                                       sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
-                                                                                                        "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
-                                                                                                        "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
+# ================================================
+#              Open -  Close Price
+# ================================================
+if Price == "Close":
+    # Read CSV file for Cutoff dates (Market Cap)
+    Securities_Cutoff_MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
+                                        
+    Securities_Cutoff_MARSEP = Securities_Cutoff_MARSEP.dropna(subset=["stoxxId_Cutoff"])
+                                        
+    Securities_Cutoff_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
 
-Securities_Cutoff_JUNDEC = Securities_Cutoff_JUNDEC.dropna(subset=["stoxxId_Cutoff"])
+    Securities_Cutoff_JUNDEC = Securities_Cutoff_JUNDEC.dropna(subset=["stoxxId_Cutoff"])
 
-Securities_Cutoff = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_JUNDEC])
+    Securities_Cutoff = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_JUNDEC])
+
+else:
+    # Read CSV file for Cutoff dates (Market Cap)
+    Securities_Cutoff_MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW_OPEN.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "adjustedOpenPrice": "openPrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
+                                        
+    Securities_Cutoff_MARSEP = Securities_Cutoff_MARSEP.dropna(subset=["stoxxId_Cutoff"])
+                                        
+    Securities_Cutoff_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW_OPEN.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "adjustedOpenPrice": "openPrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
+
+    Securities_Cutoff_JUNDEC = Securities_Cutoff_JUNDEC.dropna(subset=["stoxxId_Cutoff"])
+
+    Securities_Cutoff = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_JUNDEC])
+
+# ================================================
+# ================================================
 
 # Read CSV files for Turnover
 Turnover = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_MARSEP.csv", 
@@ -90,6 +120,8 @@ Threshold_Korea = 0.65
 # Parameter for FOR
 Threshold_FOR = 0.15
 FOR_Removed = pd.DataFrame()
+Removed_Securities = pd.DataFrame()
+Added_Securities = pd.DataFrame()
 
 # Version
 Version = "20_Cutoff_Mcap_Enhanced"   
@@ -126,14 +158,31 @@ Input = Input.merge(Securities_Cutoff, left_on=["Cutoff", "Internal_Number"],
 # Calculate Full Market Cap
 Input["Full_Market_Cap_Review"] = Input["Mcap_Units_Index_Currency"] / Input["Free_Float"]
 
-# Calculate USD Price at Cutoff
-Input["Close_USD_Cutoff"] = Input["closePrice_Cutoff"] * Input["FX_Rate_Cutoff"]
+# ================================================
+#              Open -  Close Price
+# ================================================
+if Price == "Close":
+    # Calculate USD Price at Cutoff
+    Input["Close_USD_Cutoff"] = Input["closePrice_Cutoff"] * Input["FX_Rate_Cutoff"]
 
-# Calculate Free Float Market Cap as of Cutoff
-Input["Free_Float_Market_Cutoff"] = Input["Close_USD_Cutoff"] * Input["shares_Cutoff"] * Input["Free_Float"] * Input["Capfactor"]
+    # Calculate Free Float Market Cap as of Cutoff
+    Input["Free_Float_Market_Cutoff"] = Input["Close_USD_Cutoff"] * Input["shares_Cutoff"] * Input["Free_Float"] * Input["Capfactor"]
 
-# Calculate Full Market Cap as of Cutoff
-Input["Full_Market_Cap_Cutoff"] = Input["Free_Float_Market_Cutoff"] / Input["Free_Float"] / Input["Capfactor"]
+    # Calculate Full Market Cap as of Cutoff
+    Input["Full_Market_Cap_Cutoff"] = Input["Free_Float_Market_Cutoff"] / Input["Free_Float"] / Input["Capfactor"]
+
+else:
+    # Calculate USD Price at Cutoff
+    Input["Open_USD_Cutoff"] = Input["openPrice_Cutoff"] * Input["FX_Rate_Cutoff"]
+
+    # Calculate Free Float Market Cap as of Cutoff
+    Input["Free_Float_Market_Cutoff"] = Input["Open_USD_Cutoff"] * Input["shares_Cutoff"] * Input["Free_Float"] * Input["Capfactor"]
+
+    # Calculate Full Market Cap as of Cutoff
+    Input["Full_Market_Cap_Cutoff"] = Input["Free_Float_Market_Cutoff"] / Input["Free_Float"] / Input["Capfactor"]
+
+# ================================================
+# ================================================
 
 # Foreign Ownership Restriction adjusted Free Float Market Cap
 Input["FOR_FF"] = Input["Free_Float"] * Input["Capfactor"]
@@ -157,62 +206,123 @@ for date in Dates_Frame.Review:
 
         Output = pd.concat([Output, country_Input])
 
+# Add Source field
+Output["Source"] = "MID Cap Index"
+
 # Load initial setup V20
 Input_V20 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced.csv", parse_dates=["Date"], index_col=0)
 Input_V20 = Input_V20.query("Date >= '2010-03-22'")
+Input_V20["Source"] = "SMALL Cap Index"
 
 for date in Input_V20.Date.unique():
     temp_Output = Output.query("Date == @date")
-    temp_Output = temp_Output[[
-                                "Date",
-                                "Index_Component_Count",
-                                "Internal_Number",
-                                "ISIN",
-                                "SEDOL",
-                                "Instrument_Name",
-                                "Country",
-                                "Currency",
-                                "ICB",
-                                "Mcap_Units_Index_Currency",
-                                "InfoCode",
-                                "Close_USD_Cutoff",
-                                "shares_Cutoff",
-                                "freeFloat_Cutoff",
-                                "Free_Float",
-                                "Capfactor",
-                                "Free_Float_Market_Cutoff",
-                                "Full_Market_Cap_Cutoff",
-                                "FOR_FF"
-                            ]]
+
+    # ================================================
+    #              Open -  Close Price
+    # ================================================
+    if Price == "Close":
+        temp_Output = temp_Output[[
+                                    "Date",
+                                    "Index_Component_Count",
+                                    "Internal_Number",
+                                    "ISIN",
+                                    "SEDOL",
+                                    "Instrument_Name",
+                                    "Country",
+                                    "Currency",
+                                    "ICB",
+                                    "Mcap_Units_Index_Currency",
+                                    "InfoCode",
+                                    "Close_USD_Cutoff",
+                                    "shares_Cutoff",
+                                    "freeFloat_Cutoff",
+                                    "Free_Float",
+                                    "Capfactor",
+                                    "Free_Float_Market_Cutoff",
+                                    "Full_Market_Cap_Cutoff",
+                                    "FOR_FF",
+                                    "Source"
+                                ]]
     
-    temp_Input_V20 = Input_V20.query("Date == @date")
-    temp_Input_V20 = temp_Input_V20[[
-                                "Date",
-                                "Index_Component_Count",
-                                "Internal_Number",
-                                "ISIN",
-                                "SEDOL",
-                                "Instrument_Name",
-                                "Country",
-                                "Currency",
-                                "ICB",
-                                "Mcap_Units_Index_Currency",
-                                "InfoCode",
-                                "Close_USD_Cutoff",
-                                "shares_Cutoff",
-                                "freeFloat_Cutoff",
-                                "Free_Float",
-                                "Capfactor",
-                                "Free_Float_Market_Cutoff",
-                                "Full_Market_Cap_Cutoff",
-                                "FOR_FF"
-                            ]]
+        temp_Input_V20 = Input_V20.query("Date == @date")
+        temp_Input_V20 = temp_Input_V20[[
+                                    "Date",
+                                    "Index_Component_Count",
+                                    "Internal_Number",
+                                    "ISIN",
+                                    "SEDOL",
+                                    "Instrument_Name",
+                                    "Country",
+                                    "Currency",
+                                    "ICB",
+                                    "Mcap_Units_Index_Currency",
+                                    "InfoCode",
+                                    "Close_USD_Cutoff",
+                                    "shares_Cutoff",
+                                    "freeFloat_Cutoff",
+                                    "Free_Float",
+                                    "Capfactor",
+                                    "Free_Float_Market_Cutoff",
+                                    "Full_Market_Cap_Cutoff",
+                                    "FOR_FF",
+                                    "Source"
+                                ]]
+    
+    else:
+        temp_Output = temp_Output[[
+                            "Date",
+                            "Index_Component_Count",
+                            "Internal_Number",
+                            "ISIN",
+                            "SEDOL",
+                            "Instrument_Name",
+                            "Country",
+                            "Currency",
+                            "ICB",
+                            "Mcap_Units_Index_Currency",
+                            "InfoCode",
+                            "shares_Cutoff",
+                            "freeFloat_Cutoff",
+                            "Free_Float",
+                            "Capfactor",
+                            "Free_Float_Market_Cutoff",
+                            "Full_Market_Cap_Cutoff",
+                            "FOR_FF",
+                            "Source"
+                        ]]
+    
+        temp_Input_V20 = Input_V20.query("Date == @date")
+        temp_Input_V20 = temp_Input_V20[[
+                                    "Date",
+                                    "Index_Component_Count",
+                                    "Internal_Number",
+                                    "ISIN",
+                                    "SEDOL",
+                                    "Instrument_Name",
+                                    "Country",
+                                    "Currency",
+                                    "ICB",
+                                    "Mcap_Units_Index_Currency",
+                                    "InfoCode",
+                                    "shares_Cutoff",
+                                    "freeFloat_Cutoff",
+                                    "Free_Float",
+                                    "Capfactor",
+                                    "Free_Float_Market_Cutoff",
+                                    "Full_Market_Cap_Cutoff",
+                                    "FOR_FF",
+                                    "Source"
+                                ]]
+        
+    # ================================================
+    # ================================================
     
     # Recalculate the Weight
     temp_Input_V20["Weight"] = temp_Input_V20["Full_Market_Cap_Cutoff"] / temp_Input_V20["Full_Market_Cap_Cutoff"].sum() 
 
     # Drop as many rows as temp_Output
     temp_Input_V20 = temp_Input_V20.sort_values(by="Weight", ascending=False)
+    temp_Removed_Securities = temp_Input_V20.tail(len(temp_Output))
     temp_Input_V20 = temp_Input_V20.head(len(temp_Input_V20) - len(temp_Output))
 
     temp_Final_Frame = pd.concat([temp_Input_V20, temp_Output])
@@ -220,6 +330,10 @@ for date in Input_V20.Date.unique():
     temp_Final_Frame["Index_Component_Count"] = len(temp_Final_Frame)
 
     Final_Frame = pd.concat([Final_Frame, temp_Final_Frame])
+    Removed_Securities = pd.concat([Removed_Securities, temp_Removed_Securities])
+    Added_Securities = pd.concat([Added_Securities, temp_Output])
 
-Final_Frame.to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2.csv")
-Final_Frame.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC.csv")
+Final_Frame.to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2.csv")
+Final_Frame.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC.csv")
+Removed_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Removed_Securities_STEP2_OPEN_2023_DEC.csv")
+Added_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\Added_Securities_2023_DEC.csv")
