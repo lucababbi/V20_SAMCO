@@ -261,7 +261,7 @@ for date in Input_V20.Date.unique():
                                     "Index_Component_Count",
                                     "Internal_Number",
                                     "ISIN",
-                                    "SEDOL",
+                                    "SEDOL7",
                                     "Instrument_Name",
                                     "Country",
                                     "Currency",
@@ -308,7 +308,7 @@ for date in Input_V20.Date.unique():
                                     "Index_Component_Count",
                                     "Internal_Number",
                                     "ISIN",
-                                    "SEDOL",
+                                    "SEDOL7",
                                     "Instrument_Name",
                                     "Country",
                                     "Currency",
@@ -345,14 +345,18 @@ for date in Input_V20.Date.unique():
     if temp_Final_Frame['Mcap_Units_Index_Currency_Open'].isnull().any():
         print("There are empty (NaN) values in the column 'Mcap_Units_Index_Currency_Open'")
 
-    temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency_Open"] / temp_Final_Frame["Mcap_Units_Index_Currency_Open"].sum()
+    if Price == "Close":
+        temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency_Open"] / temp_Final_Frame["Mcap_Units_Index_Currency_Open"].sum()
+    else:
+        temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency"] / temp_Final_Frame["Mcap_Units_Index_Currency"].sum()
+
     temp_Final_Frame["Index_Component_Count"] = len(temp_Final_Frame)
 
     Final_Frame = pd.concat([Final_Frame, temp_Final_Frame])
     Removed_Securities = pd.concat([Removed_Securities, temp_Removed_Securities])
     Added_Securities = pd.concat([Added_Securities, temp_Output])
 
-Final_Frame.to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2024.csv")
-Final_Frame.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC.csv")
-Removed_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Removed_Securities_STEP2_OPEN_2023_DEC.csv")
-Added_Securities.query("Date == '2023-12-18'").to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Open\2024\Added_Securities_2023_DEC.csv")
+Final_Frame.drop(columns={"Mcap_Units_Index_Currency", "InfoCode", "shares_Cutoff", "freeFloat_Cutoff", "Free_Float", "Capfactor", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2024_{Price}.csv")
+Final_Frame.drop(columns={"Mcap_Units_Index_Currency", "InfoCode", "shares_Cutoff", "freeFloat_Cutoff", "Free_Float", "Capfactor", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_{Price}.csv")
+Removed_Securities.drop(columns={"Mcap_Units_Index_Currency", "InfoCode", "shares_Cutoff", "freeFloat_Cutoff", "Free_Float", "Capfactor", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Removed_Securities_STEP2_OPEN_2023_DEC_{Price}.csv")
+Added_Securities.drop(columns={"Mcap_Units_Index_Currency", "InfoCode", "shares_Cutoff", "freeFloat_Cutoff", "Free_Float", "Capfactor", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Added_Securities_2023_DEC_{Price}.csv")
