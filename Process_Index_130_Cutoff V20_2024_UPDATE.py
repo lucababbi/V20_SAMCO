@@ -28,26 +28,28 @@ PRE = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SA
 PRE = PRE.query("Mcap_Units_Index_Currency > 0")
 
 # Re-arrange PRE Frame to adapt to newer one
-PRE = PRE[["Date", "Internal_Number", "ISIN", "SEDOL", "RIC", "Instrument_Name", "Country", "Currency", "exchange", 
+PRE = PRE[["Date", "Index_Symbol", "Internal_Number", "ISIN", "SEDOL", "RIC", "Instrument_Name", "Country", "Currency", "exchange", 
            "ICB", "Shares", "Free_Float", "Capfactor", "Close_unadjusted_local", "FX_local_to_Index_Currency", "Mcap_Units_Index_Currency", "Weight"]].rename(columns={"exchange": "Exchange"})
     
 POST = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\Updated_Universe\POST_MAR_2023.csv",
                     parse_dates=["Date"], index_col=0)
 
+# Remove empty/null Securities
+POST = POST.query("Mcap_Units_Index_Currency > 0")
+
 # Remove unuseful columns
-POST = POST[["Date", "Internal_Number", "ISIN", "SEDOL", "RIC", "Instrument_Name", "Country", "Currency", "Exchange",
+POST = POST[["Date", "Index_Symbol", "Internal_Number", "ISIN", "SEDOL", "RIC", "Instrument_Name", "Country", "Currency", "Exchange",
              "ICB", "Shares", "Free_Float", "Capfactor", "Close_unadjusted_local", "FX_local_to_Index_Currency", "Mcap_Units_Index_Currency", "Weight"]]
 
-# Remove SEDOL7 from original Input
-Input_JUNDEC = Input_JUNDEC[Input_JUNDEC_2024.columns]
 # Concat the two Inputs
-Input_JUNDEC = pd.concat([Input_JUNDEC, Input_JUNDEC_2024])
+Input = pd.concat([PRE, POST])
 
-Input_JUNDEC = Input_JUNDEC.query("Mcap_Units_Index_Currency > 0")
+# Add Cutoff information
+Input = Input.merge(Dates_Frame, left_on="Date", right_on="Review", how="left").drop(columns={"Review"})
 
 # Add information of InfoCode
-Input_JUNDEC = sqldf("""
-                     SELECT * FROM Input_JUNDEC AS Input
+Input = sqldf("""
+                     SELECT * FROM Input AS Input
                      LEFT JOIN InfoCode AS Info
                      ON Info.StoxxId = Input.Internal_Number
                      WHERE Input.Date >= Info.vf
@@ -55,10 +57,10 @@ Input_JUNDEC = sqldf("""
                     """
                     )
 
-Input_JUNDEC["Date"] = pd.to_datetime(Input_JUNDEC["Date"])
-Input_JUNDEC["Cutoff"] = pd.to_datetime(Input_JUNDEC["Cutoff"])
-Input_JUNDEC = Input_JUNDEC.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCodeSource", "vf", "vt", "SecId","Sedol6", "Isin", "Ric"})
-Input_JUNDEC = Input_JUNDEC.dropna(subset="InfoCode")
+Input["Date"] = pd.to_datetime(Input["Date"])
+Input["Cutoff"] = pd.to_datetime(Input["Cutoff"])
+Input = Input.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCodeSource", "vf", "vt", "SecId","Sedol6", "Isin", "Ric"})
+Input = Input.dropna(subset="InfoCode")
 
 # Read CSV file for Cutoff dates (Market Cap)
 Securities_Cutoff_MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW.csv",
@@ -112,7 +114,7 @@ Turnover_JUNDEC_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Proj
 # Merge the old and new Input
 Turnover_JUNDEC = pd.concat([Turnover_JUNDEC, Turnover_JUNDEC_2024])
 
-# Merget the two Frame with Turnoveru
+# Merget the two Frame with Turnover
 Turnover = pd.concat([Turnover, Turnover_JUNDEC]).sort_values(by="Date")
 
 # Define parameters for Turnover
@@ -135,13 +137,6 @@ Filtered = pd.DataFrame()
 # Add Turnover Information
 Input = Input.merge(Turnover[["InfoCode", "Turnover_Ratio", "Date", "Start", "End"]], left_on=["InfoCode", "Date"], 
                             right_on=["InfoCode", "Date"], how="left")
-
-# Add Turnover Information
-Input_JUNDEC = Input_JUNDEC.merge(Turnover[["InfoCode", "Turnover_Ratio", "Date", "Start", "End"]], left_on=["InfoCode", "Date"], 
-                            right_on=["InfoCode", "Date"], how="left")
-
-# Merge the two Frames with Input
-Input = pd.concat([Input, Input_JUNDEC], ignore_index=True).sort_values(by="Date", ascending=True)
 
 # Set Turnover equal to 0 where NaN
 Input["Turnover_Ratio"] = Input["Turnover_Ratio"].fillna(0)
@@ -195,14 +190,17 @@ for date in Dates_Frame["Cutoff"]:
         # Apply Turnover Ratio filter
         temp_Input = temp_Input.query("Turnover_Ratio > @New")
 
-        # Remove 'A'-CCS from Small Cap Universe
-        temp_Input = temp_Input.query('\
-            ~((Country == "CN") \
-            and (\
-                Instrument_Name.str.contains("\'A\'") \
-                or Instrument_Name.str.contains("(CCS)")\
-            ) \
-            and (Index_Symbol == "SWESCGV"))')
+        if date <= pd.to_datetime("2023-03-20"):
+            # Remove 'A'-CCS from Small Cap Universe
+            temp_Input = temp_Input.query('\
+                ~((Country == "CN") \
+                and (\
+                    Instrument_Name.str.contains("\'A\'") \
+                    or Instrument_Name.str.contains("(CCS)")\
+                ) \
+                and (Index_Symbol == "SWESCGV"))')
+        else:
+            temp_Input = temp_Input.query("Exchange != 'Stock Exchange of Hong Kong - SSE Securities' and Exchange != 'Stock Exchange of Hong Kong - SZSE Securities'")
         
         # Add removed securities to the Frame
         temp_Removed = temp_Input[temp_Input["FOR_FF"] < Threshold_FOR]
@@ -231,7 +229,7 @@ for date in Dates_Frame["Cutoff"]:
         temp_Input["Weight"] = temp_Input["Mcap_Units_Index_Currency"] / temp_Input["Mcap_Units_Index_Currency"].sum()
 
         temp_Input["Prev_Comp"] = False
-        temp_Input.Index_Component_Count = len(temp_Input)
+        temp_Input["Index_Component_Count"] = len(temp_Input)
         Output = pd.concat([Output, temp_Input])
         Prev_Comp = temp_Input
 
@@ -245,14 +243,17 @@ for date in Dates_Frame["Cutoff"]:
         # Apply Turnover Ratio filter
         temp_Input = temp_Input.query("(Prev_Comp == True & Turnover_Ratio > @Old) | (Prev_Comp == False & Turnover_Ratio > @New)")
 
-        # Remove 'A'-CCS from Small Cap Universe
-        temp_Input = temp_Input.query('\
-            ~((Country == "CN") \
-            and (\
-                Instrument_Name.str.contains("\'A\'") \
-                or Instrument_Name.str.contains("(CCS)")\
-            ) \
-            and (Index_Symbol == "SWESCGV"))')
+        if date <= pd.to_datetime("2023-03-20"):
+            # Remove 'A'-CCS from Small Cap Universe
+            temp_Input = temp_Input.query('\
+                ~((Country == "CN") \
+                and (\
+                    Instrument_Name.str.contains("\'A\'") \
+                    or Instrument_Name.str.contains("(CCS)")\
+                ) \
+                and (Index_Symbol == "SWESCGV"))')
+        else:
+            temp_Input = temp_Input.query("Exchange != 'Stock Exchange of Hong Kong - SSE Securities' and Exchange != 'Stock Exchange of Hong Kong - SZSE Securities'")
 
         # Add removed securities to the Frame
         temp_Removed = temp_Input[temp_Input["FOR_FF"] < Threshold_FOR]
@@ -284,11 +285,10 @@ for date in Dates_Frame["Cutoff"]:
         temp_Input["Weight"] = temp_Input["Mcap_Units_Index_Currency"] / temp_Input["Mcap_Units_Index_Currency"].sum()
 
         Prev_Comp = temp_Input
-        temp_Input.Index_Component_Count = len(temp_Input)
+        temp_Input["Index_Component_Count"] = len(temp_Input)  
         Output = pd.concat([Output, temp_Input])
 
         FOR_Removed = pd.concat([FOR_Removed, temp_Removed])
-
 
 Output[[
     "Date",
@@ -299,7 +299,7 @@ Output[[
     "Instrument_Name",
     "Country",
     "Currency",
-    "exchange",
+    "Exchange",
     "ICB",
     "Mcap_Units_Index_Currency",
     "InfoCode",
@@ -315,14 +315,13 @@ Output[[
 
 FOR_Removed[[
     "Date",
-    "Index_Component_Count",
     "Internal_Number",
     "ISIN",
     "SEDOL",
     "Instrument_Name",
     "Country",
     "Currency",
-    "exchange",
+    "Exchange",
     "ICB",
     "Mcap_Units_Index_Currency",
     "InfoCode",
