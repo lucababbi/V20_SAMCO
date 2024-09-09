@@ -150,7 +150,7 @@ opclo = "close"
 JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"], index_col=0)
 MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"], index_col=0)
 Review_Date = pd.concat([MARSEP, JUNDEC]).sort_values(by="Review")
-Review_Date = Review_Date[106:] # Keep only until index went live
+Review_Date = Review_Date[105:] # Keep only until index went live
 Output = pd.DataFrame()
 
 for date in Review_Date["Review"]:
