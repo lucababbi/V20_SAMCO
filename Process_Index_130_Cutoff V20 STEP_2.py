@@ -347,3 +347,22 @@ Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_C
 Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_{Price}.csv")
 Removed_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Removed_Securities_STEP2_OPEN_2023_DEC_{Price}.csv")
 Added_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Added_Securities_2023_DEC_{Price}.csv")
+
+# Read CapFactor from SWACALLCAP
+Capfactor = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\Capfactor_SWACALLCAP_MAR2019.csv", index_col=0, parse_dates=["Date"])
+
+# Drop JUN2024 composition
+Final_Frame = Final_Frame.query("Date < '2024-06-24'").drop(columns={"Capfactor", "Mcap_Units_Index_Currency"})
+Final_Frame = Final_Frame.merge(Capfactor, on=["Date", "Internal_Number"], how="left")
+
+Sharable_Frame = pd.DataFrame()
+
+# Recalculate Weights
+for date in Final_Frame.Date.unique():
+    temp_Final_Frame = Final_Frame.query("Date == @date")
+
+    temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency"] / temp_Final_Frame["Mcap_Units_Index_Currency"].sum()
+
+    Sharable_Frame = pd.concat([temp_Final_Frame, Sharable_Frame])
+
+Sharable_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_{Price}.csv")
