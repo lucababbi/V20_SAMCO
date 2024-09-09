@@ -143,14 +143,14 @@ def get_last_business_day_of_month(date):
 
     return EOM
 
-idx = "SWESCGV" 
+idx = "STXWAGV" 
 opclo = "close"
 
 # Create DataFrame with Review and Cutoff dates
 JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"], index_col=0)
 MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"], index_col=0)
 Review_Date = pd.concat([MARSEP, JUNDEC]).sort_values(by="Review")
-Review_Date = Review_Date[105:] # Keep only until index went live
+Review_Date = Review_Date.tail(22)
 Output = pd.DataFrame()
 
 for date in Review_Date["Review"]:
@@ -160,4 +160,5 @@ for date in Review_Date["Review"]:
     Output = pd.concat((Output, cons))
     print(Output)
 
-Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\Updated_Universe\Update_Universe_JUN2023.csv")
+Output = Output[["Date", "Internal_Number", "Capfactor"]]
+Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\Capfactor_SWACALLCAP_MAR2019.csv")
