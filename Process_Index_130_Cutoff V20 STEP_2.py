@@ -8,8 +8,8 @@ from pandasql import sqldf
 # ================================================
 #              Open -  Close Price
 # ================================================
-Price = "Open"
-FX_Rate_T_1 = True
+Price = "Close"
+FX_Rate_T_1 = False
 
 InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
@@ -243,6 +243,7 @@ for date in Input_V20.Date.unique():
                                     "Country",
                                     "Currency",
                                     "ICB",
+                                    "Capfactor",
                                     "Mcap_Units_Index_Currency",
                                     "InfoCode",
                                     "Free_Float_Market_Cutoff",
@@ -261,6 +262,7 @@ for date in Input_V20.Date.unique():
                                     "Country",
                                     "Currency",
                                     "ICB",
+                                    "Capfactor",
                                     "Mcap_Units_Index_Currency",
                                     "InfoCode",
                                     "Free_Float_Market_Cutoff",
@@ -279,6 +281,7 @@ for date in Input_V20.Date.unique():
                             "Country",
                             "Currency",
                             "ICB",
+                            "Capfactor",
                             "Mcap_Units_Index_Currency",
                             "InfoCode",
                             "Free_Float_Market_Cutoff",
@@ -297,6 +300,7 @@ for date in Input_V20.Date.unique():
                                     "Country",
                                     "Currency",
                                     "ICB",
+                                    "Capfactor",
                                     "Mcap_Units_Index_Currency",
                                     "InfoCode",
                                     "Free_Float_Market_Cutoff",
@@ -329,6 +333,7 @@ for date in Input_V20.Date.unique():
         temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency_Open"] / temp_Final_Frame["Mcap_Units_Index_Currency_Open"].sum()
     else:
         temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency"] / temp_Final_Frame["Mcap_Units_Index_Currency"].sum()
+        temp_Final_Frame = temp_Final_Frame.drop(columns={"Mcap_Units_Index_Currency_Open"})
 
     temp_Final_Frame["Index_Component_Count"] = len(temp_Final_Frame)
 
