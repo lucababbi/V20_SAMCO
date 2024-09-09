@@ -18,6 +18,8 @@ InfoCode["vt"] = InfoCode["vt"].replace("99991230", "21001230")
 InfoCode["vt"] = pd.to_datetime(InfoCode["vt"], format = "%Y%m%d")
 # Infocode = InfoCode.loc[InfoCode.groupby("StoxxId")["vt"].idxmax()]
 
+SEDOLs = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SEDOLsMapping.csv", parse_dates=["Date"], index_col=0)
+
 Dates_Frame = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", index_col=0, parse_dates=["Review", "Cutoff"])
 Dates_Frame_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", index_col=0, parse_dates=["Review", "Cutoff"])
 
@@ -341,7 +343,7 @@ for date in Input_V20.Date.unique():
     if temp_Final_Frame['Mcap_Units_Index_Currency_Open'].isnull().any():
         print("There are empty (NaN) values in the column 'Mcap_Units_Index_Currency_Open'")
 
-    if Price == "Close":
+    if Price == "Open":
         temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency_Open"] / temp_Final_Frame["Mcap_Units_Index_Currency_Open"].sum()
     else:
         temp_Final_Frame["Weight"] = temp_Final_Frame["Mcap_Units_Index_Currency"] / temp_Final_Frame["Mcap_Units_Index_Currency"].sum()
@@ -351,6 +353,8 @@ for date in Input_V20.Date.unique():
     Final_Frame = pd.concat([Final_Frame, temp_Final_Frame])
     Removed_Securities = pd.concat([Removed_Securities, temp_Removed_Securities])
     Added_Securities = pd.concat([Added_Securities, temp_Output])
+
+Final_Frame = Final_Frame.merge(SEDOLs, on=["Date", "Internal_Number"], how="left")
 
 Final_Frame.drop(columns={"Mcap_Units_Index_Currency", "InfoCode", "shares_Cutoff", "freeFloat_Cutoff", "Free_Float", "Capfactor", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2024_{Price}.csv")
 Final_Frame.drop(columns={"Mcap_Units_Index_Currency", "InfoCode", "shares_Cutoff", "freeFloat_Cutoff", "Free_Float", "Capfactor", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_{Price}.csv")
