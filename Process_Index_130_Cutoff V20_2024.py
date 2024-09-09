@@ -21,22 +21,24 @@ Dates_Frame = pd.concat([Dates_Frame, Dates_Frame_JUNDEC]).sort_values(by="Revie
 Cleaned_Frame = pd.DataFrame()
 
 # Read CSV file, parse dates, handle NA values, drop rows with NA, and specify dtype
-PRE = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\Updated_Universe\PRE_MAR_2023.csv",
-                    index_col=0, parse_dates=["Date"])
+Input = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_MARSEP.csv",
+                    index_col=0, parse_dates=["Date", "Cutoff"])
 
-# Remove empty/null Securities
-PRE = PRE.query("Mcap_Units_Index_Currency > 0")
+Input_MARSEP_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_MARSEP_2024.csv",
+                    index_col=0, parse_dates=["Date", "Cutoff"])
 
-# Re-arrange PRE Frame to adapt to newer one
-PRE = PRE[["Date", "Internal_Number", "ISIN", "SEDOL", "RIC", "Instrument_Name", "Country", "Currency", "exchange", 
-           "ICB", "Shares", "Free_Float", "Capfactor", "Close_unadjusted_local", "FX_local_to_Index_Currency", "Mcap_Units_Index_Currency", "Weight"]].rename(columns={"exchange": "Exchange"})
+# Remove SEDOL7 from original Input
+Input = Input[Input_MARSEP_2024.columns]
+# Concat the two Inputs
+Input = pd.concat([Input, Input_MARSEP_2024])
+
+Input = Input.query("Mcap_Units_Index_Currency > 0")
     
-POST = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\Updated_Universe\POST_MAR_2023.csv",
-                    parse_dates=["Date"], index_col=0)
+Input_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_JUNDEC.csv",
+                    parse_dates=["Date", "Cutoff"], index_col=0)
 
-# Remove unuseful columns
-POST = POST[["Date", "Internal_Number", "ISIN", "SEDOL", "RIC", "Instrument_Name", "Country", "Currency", "Exchange",
-             "ICB", "Shares", "Free_Float", "Capfactor", "Close_unadjusted_local", "FX_local_to_Index_Currency", "Mcap_Units_Index_Currency", "Weight"]]
+Input_JUNDEC_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWESCGV_JUNDEC_2024.csv",
+                    parse_dates=["Date", "Cutoff"], index_col=0)
 
 # Remove SEDOL7 from original Input
 Input_JUNDEC = Input_JUNDEC[Input_JUNDEC_2024.columns]
@@ -59,6 +61,20 @@ Input_JUNDEC["Date"] = pd.to_datetime(Input_JUNDEC["Date"])
 Input_JUNDEC["Cutoff"] = pd.to_datetime(Input_JUNDEC["Cutoff"])
 Input_JUNDEC = Input_JUNDEC.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCodeSource", "vf", "vt", "SecId","Sedol6", "Isin", "Ric"})
 Input_JUNDEC = Input_JUNDEC.dropna(subset="InfoCode")
+
+Input = sqldf("""
+                     SELECT * FROM Input AS Input
+                     LEFT JOIN InfoCode AS Info
+                     ON Info.StoxxId = Input.Internal_Number
+                     WHERE Input.Date >= Info.vf
+                     AND Input.Date <= Info.vt                     
+                    """
+                    )
+
+Input["Date"] = pd.to_datetime(Input["Date"])
+Input["Cutoff"] = pd.to_datetime(Input["Cutoff"])
+Input = Input.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCodeSource", "vf", "vt", "SecId","Sedol6", "Isin", "Ric"})
+Input = Input.dropna(subset="InfoCode")
 
 # Read CSV file for Cutoff dates (Market Cap)
 Securities_Cutoff_MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW.csv",
