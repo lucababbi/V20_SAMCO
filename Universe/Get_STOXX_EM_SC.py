@@ -143,13 +143,14 @@ def get_last_business_day_of_month(date):
 
     return EOM
 
-idx = "STXWAGV" 
+idx = "SWESCGV" 
 opclo = "close"
 
 # Create DataFrame with Review and Cutoff dates
-JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"])
-MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"])
-Review_Date = pd.concat([MARSEP, JUNDEC])
+JUNDEC = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-JUN-DEC.csv", parse_dates=["Review", "Cutoff"], index_col=0)
+MARSEP = pd.read_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Dates\Review_Date-MAR-SEP.csv", parse_dates=["Review", "Cutoff"], index_col=0)
+Review_Date = pd.concat([MARSEP, JUNDEC]).sort_values(by="Review")
+Review_Date = Review_Date[106:] # Keep only until index went live
 Output = pd.DataFrame()
 
 for date in Review_Date["Review"]:
@@ -159,5 +160,4 @@ for date in Review_Date["Review"]:
     Output = pd.concat((Output, cons))
     print(Output)
 
-Output = Output[["Date", "Internal_Number", "SEDOL"]]
-Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\SEDOLsMapping.csv")
+Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\Updated_Universe\Update_Universe_JUN2023.csv")
