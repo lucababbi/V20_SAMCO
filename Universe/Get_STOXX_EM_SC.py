@@ -160,5 +160,4 @@ for date in Review_Date["Review"]:
     Output = pd.concat((Output, cons))
     print(Output)
 
-Output = Output[["Date", "Internal_Number", "Capfactor", "Mcap_Units_Index_Currency"]]
 Output.to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Universe\SWEMCGV_2024.csv")
