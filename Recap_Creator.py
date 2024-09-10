@@ -69,7 +69,8 @@ Sharable_Table = pd.DataFrame(columns=[
                                         "Version",
                                         "Count",
                                         "NotInV20",
-                                        "Total_Weight"
+                                        "Total_Weight",
+                                        "OneWayTurnover"
                                       ])
 
 # Read Open MCAP from SWACALLCAP
@@ -78,14 +79,25 @@ MARSEP = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20
 JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWACALLCAP_JUNDEC_OPEN.csv", parse_dates=["Date"], index_col=0)
 SWACALLCAP = pd.concat([MARSEP, JUNDEC]).rename(columns={"Mcap_Units_Index_Currency": "Mcap_Units_Index_Currency_Open"})
 
+# Add Open_MCAP to Shared_Client version
+Shared_Client = Shared_Client.merge(SWACALLCAP, left_on=["Date", "internalNumber"], right_on=["Date", "Internal_Number"]).drop(columns={"internalNumber"})
+Shared_Client["Open_Weight"] = Shared_Client["Mcap_Units_Index_Currency_Open"] / Shared_Client["Mcap_Units_Index_Currency_Open"].sum()
+
 for Version in Versions:
     Final_Frame[Version] = Final_Frame[Version].merge(SWACALLCAP, on=["Date", "Internal_Number"], how="left")
     Final_Frame[Version]["Open_Weight"] = Final_Frame[Version]["Mcap_Units_Index_Currency_Open"] / Final_Frame[Version]["Mcap_Units_Index_Currency_Open"].sum()
 
+    # Create OneWayTurnover Frame
+    SupportFrame = Final_Frame[Version][["Date", "Internal_Number", "Open_Weight"]].merge(Shared_Client[["Date", "Internal_Number", "Open_Weight"]], on=["Date", "Internal_Number"], how="outer").rename(columns={"Open_Weight_x":
+                                        "Open_Weight", "Open_Weight_y": "Open_Weight_Shared"}).fillna(0)
+    
+    OneWayTurnover = abs(SupportFrame["Open_Weight"] - SupportFrame["Open_Weight_Shared"]).sum() / 2
+
     temp_Sharable_Table = pd.DataFrame({"Version": Version,
                                         "Count": len(Final_Frame[Version]),
-                                        "NotInV20": [len(Final_Frame[Version][~Final_Frame[Version]["Internal_Number"].isin(Shared_Client["internalNumber"])])],
-                                        "Total_Weight": [Final_Frame[Version][~Final_Frame[Version]["Internal_Number"].isin(Shared_Client["internalNumber"])]["Open_Weight"].sum()]
+                                        "NotInV20": [len(Final_Frame[Version][~Final_Frame[Version]["Internal_Number"].isin(Shared_Client["Internal_Number"])])],
+                                        "Total_Weight": [Final_Frame[Version][~Final_Frame[Version]["Internal_Number"].isin(Shared_Client["Internal_Number"])]["Open_Weight"].sum()],
+                                        "OneWayTurnover": OneWayTurnover
                                       })
     
     Sharable_Table = pd.concat([Sharable_Table, temp_Sharable_Table])
