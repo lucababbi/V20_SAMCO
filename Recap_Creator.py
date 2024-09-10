@@ -4,7 +4,7 @@ import glob
 
 Versions = ["V1", "V2", "V3"]
 Price = "Close"
-Store_Excel = True
+Store_Excel = False
 # Dictionary to hold DataFrames
 Frame = {}
 Final_Frame = {}
@@ -15,7 +15,7 @@ Path = r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output"
 # Read each versions
 for Version in Versions:
     if Version == "V1":
-        CSV = os.path.join(Path, Price, "2024", Version,"Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_Close.csv")
+        CSV = os.path.join(Path, Price, "2024", Version,"Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_Close_V1.csv")
     else:
         CSV = os.path.join(Path, Price, "2024", Version, "Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_Close_" + Version + ".csv")
 

@@ -313,6 +313,7 @@ for date in Input_V20.Date.unique():
                                     "Currency",
                                     "ICB",
                                     "Capfactor",
+                                    "Free_Float",
                                     "Mcap_Units_Index_Currency",
                                     "InfoCode",
                                     "Free_Float_Market_Cutoff",
@@ -332,6 +333,7 @@ for date in Input_V20.Date.unique():
                                     "Currency",
                                     "ICB",
                                     "Capfactor",
+                                    "Free_Float",
                                     "Mcap_Units_Index_Currency",
                                     "InfoCode",
                                     "Free_Float_Market_Cutoff",
@@ -351,6 +353,7 @@ for date in Input_V20.Date.unique():
                             "Currency",
                             "ICB",
                             "Capfactor",
+                            "Free_Float",
                             "Mcap_Units_Index_Currency",
                             "InfoCode",
                             "Free_Float_Market_Cutoff",
@@ -370,6 +373,7 @@ for date in Input_V20.Date.unique():
                                     "Currency",
                                     "ICB",
                                     "Capfactor",
+                                    "Free_Float",
                                     "Mcap_Units_Index_Currency",
                                     "InfoCode",
                                     "Free_Float_Market_Cutoff",
@@ -414,8 +418,8 @@ Final_Frame = Final_Frame.merge(SEDOLs, on=["Date", "Internal_Number"], how="lef
 
 Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2024_{Price}_{Base}.csv")
 Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_{Price}_{Base}.csv")
-Removed_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Removed_Securities_STEP2_OPEN_2023_DEC_{Price}_{Base}.csv")
-Removed_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Removed_Securities_STEP2_OPEN_FULL_{Price}_{Base}.csv")
+Removed_Securities.drop(columns={"Index_Component_Count", "InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Removed_Securities_STEP2_2023_DEC_{Price}_{Base}.csv")
+Removed_Securities.drop(columns={"Index_Component_Count", "InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Removed_Securities_STEP2_FULL_{Price}_{Base}.csv")
 Added_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Added_Securities_2023_DEC_{Price}_{Base}.csv")
 
 # Read CapFactor from SWACALLCAP
