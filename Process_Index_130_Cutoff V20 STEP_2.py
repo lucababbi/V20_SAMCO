@@ -10,7 +10,7 @@ from pandasql import sqldf
 # ================================================
 Price = "Close"
 FX_Rate_T_1 = False
-Base = "V1"
+Base = "V3"
 
 InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
@@ -68,6 +68,24 @@ MID_JUNDEC["Date"] = pd.to_datetime(MID_JUNDEC["Date"])
 MID_JUNDEC = MID_JUNDEC.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCodeSource", "vf", "vt", "SecId","Sedol6", "Isin", "Ric"})
 MID_JUNDEC = MID_JUNDEC.dropna(subset="InfoCode")
 
+# Add 2024 MID Cap Universe
+MID_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWEMCGV_2024.csv", parse_dates=["Date"], index_col=0)
+MID_2024 = sqldf("""
+                     SELECT * FROM MID_2024 AS Input
+                     LEFT JOIN InfoCode AS Info
+                     ON Info.StoxxId = Input.Internal_Number
+                     WHERE Input.Date >= Info.vf
+                     AND Input.Date <= Info.vt                     
+                    """
+                    )
+
+MID_2024["Date"] = pd.to_datetime(MID_2024["Date"])
+MID_2024 = MID_2024.drop(columns={"InfoCodeSource", "SecCode", "SecCodeRegion", "SecCodeSource", "vf", "vt", "SecId","Sedol6", "Isin", "Ric"})
+MID_2024 = MID_2024.dropna(subset="InfoCode")
+
+# Partial Concat
+MID_JUNDEC = pd.concat([MID_JUNDEC, MID_2024])
+
 # ================================================
 #              Open -  Close Price
 # ================================================
@@ -79,7 +97,17 @@ if Price == "Close":
                                                                                                             "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
                                         
     Securities_Cutoff_MARSEP = Securities_Cutoff_MARSEP.dropna(subset=["stoxxId_Cutoff"])
+
+    # Add 2024 MARSEP Cutoff Information
+    Securities_Cutoff_MARSEP_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW_2024.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
                                         
+    Securities_Cutoff_MARSEP_2024 = Securities_Cutoff_MARSEP_2024.dropna(subset=["stoxxId_Cutoff"])
+
+    Securities_Cutoff_MARSEP = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_MARSEP_2024])
+                          
     Securities_Cutoff_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW.csv",
                                         sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
                                                                                                             "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
@@ -87,6 +115,17 @@ if Price == "Close":
 
     Securities_Cutoff_JUNDEC = Securities_Cutoff_JUNDEC.dropna(subset=["stoxxId_Cutoff"])
 
+    # Add 2024 JUNDEC Cutoff Information
+    Securities_Cutoff_JUNDEC_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW_2024.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
+
+    Securities_Cutoff_JUNDEC_2024 = Securities_Cutoff_JUNDEC_2024.dropna(subset=["stoxxId_Cutoff"])
+
+    Securities_Cutoff_JUNDEC = pd.concat([Securities_Cutoff_JUNDEC, Securities_Cutoff_JUNDEC_2024])
+
+    # Concat the two Frames
     Securities_Cutoff = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_JUNDEC])
 
 else:
@@ -97,7 +136,16 @@ else:
                                                                                                             "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
                                         
     Securities_Cutoff_MARSEP = Securities_Cutoff_MARSEP.dropna(subset=["stoxxId_Cutoff"])
+
+    Securities_Cutoff_MARSEP_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_MARSEP_NEW_2024_OPEN.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
                                         
+    Securities_Cutoff_MARSEP_2024 = Securities_Cutoff_MARSEP_2024.dropna(subset=["stoxxId_Cutoff"])
+
+    Securities_Cutoff_MARSEP = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_MARSEP_2024])
+                   
     Securities_Cutoff_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW_OPEN.csv",
                                         sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
                                                                                                             "adjustedOpenPrice": "openPrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
@@ -105,6 +153,17 @@ else:
 
     Securities_Cutoff_JUNDEC = Securities_Cutoff_JUNDEC.dropna(subset=["stoxxId_Cutoff"])
 
+    # Add 2024 JUNDEC Cutoff Information
+    Securities_Cutoff_JUNDEC_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Security_Cutoff\Output_Securities_Cutoff_JUNDEC_NEW_2024_OPEN.csv",
+                                        sep=",", parse_dates=["validDate"], index_col=0).rename(columns={"stoxxId": "stoxxId_Cutoff", "currency": "currency_Cutoff",
+                                                                                                            "closePrice": "closePrice_Cutoff", "freeFloat": "freeFloat_Cutoff",
+                                                                                                            "shares": "shares_Cutoff", "Capfactor": "Capfactor_Cutoff"})
+
+    Securities_Cutoff_JUNDEC_2024 = Securities_Cutoff_JUNDEC_2024.dropna(subset=["stoxxId_Cutoff"])
+
+    Securities_Cutoff_JUNDEC = pd.concat([Securities_Cutoff_JUNDEC, Securities_Cutoff_JUNDEC_2024])
+
+    # Concat the two Frames
     Securities_Cutoff = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_JUNDEC])
 
 # ================================================
@@ -113,8 +172,15 @@ else:
 # Read CSV files for Turnover
 Turnover = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_MARSEP.csv", 
                     parse_dates=["Date"], dtype={"InfoCode": "int64"})
+Turnover_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_MARSEP_2024.csv", 
+                    parse_dates=["Date"], dtype={"InfoCode": "int64"})
+Turnover = pd.concat([Turnover, Turnover_2024])
+
 Turnover_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_JUNDEC.csv",
                     parse_dates=["Date"], dtype={"InfoCode": "int64"})
+Turnover_JUNDEC_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_JUNDEC_2024.csv",
+                    parse_dates=["Date"], dtype={"InfoCode": "int64"})
+Turnover_JUNDEC = pd.concat([Turnover_JUNDEC, Turnover_JUNDEC_2024])
 
 # Merget the two Frame with Turnoveru
 Turnover = pd.concat([Turnover, Turnover_JUNDEC]).sort_values(by="Date")
@@ -158,6 +224,8 @@ Input["Turnover_Ratio"] = Input["Turnover_Ratio"].fillna(0)
 # Add FX_Rate as of Cutoff
 if FX_Rate_T_1 == False:
     FX_Rate = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\FX\FX_Historical_UPDATE.csv", index_col=0, parse_dates=["cutoff_date"])
+    FX_Rate_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\FX\FX_Historical_UPDATE_2024.csv", index_col=0, parse_dates=["cutoff_date"])
+    FX_Rate = pd.concat([FX_Rate, FX_Rate_2024])
     Input = Input.merge(FX_Rate, left_on=["Cutoff", "Currency"], right_on=["cutoff_date", "frm_currency"]).drop(columns={"frm_currency", 
                                 "to_currency", "cutoff_date"}).rename(columns={"exchange_rate": "FX_Rate_Cutoff"})
 else:
