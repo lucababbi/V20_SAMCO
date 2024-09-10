@@ -10,6 +10,7 @@ from pandasql import sqldf
 # ================================================
 Price = "Close"
 FX_Rate_T_1 = False
+Base = "V1"
 
 InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
@@ -223,7 +224,7 @@ for date in Dates_Frame.Review:
 Output["Source"] = "MID Cap Index"
 
 # Load initial setup V20
-Input_V20 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V20_Cutoff_Mcap_Enhanced_2024.csv", parse_dates=["Date"], index_col=0)
+Input_V20 = pd.read_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Base}_Base\Final_Buffer_V20_Cutoff_Mcap_Enhanced_2024.csv", parse_dates=["Date"], index_col=0)
 Input_V20 = Input_V20.query("Date >= '2019-03-18'")
 Input_V20["Source"] = "SMALL Cap Index"
 
@@ -343,10 +344,11 @@ for date in Input_V20.Date.unique():
 
 Final_Frame = Final_Frame.merge(SEDOLs, on=["Date", "Internal_Number"], how="left")
 
-Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2024_{Price}.csv")
-Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_{Price}.csv")
-Removed_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Removed_Securities_STEP2_OPEN_2023_DEC_{Price}.csv")
-Added_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Added_Securities_2023_DEC_{Price}.csv")
+Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2024_{Price}_{Base}.csv")
+Final_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_2023_DEC_{Price}_{Base}.csv")
+Removed_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Removed_Securities_STEP2_OPEN_2023_DEC_{Price}_{Base}.csv")
+Removed_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Removed_Securities_STEP2_OPEN_FULL_{Price}_{Base}.csv")
+Added_Securities.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).query("Date == '2023-12-18'").to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Added_Securities_2023_DEC_{Price}_{Base}.csv")
 
 # Read CapFactor from SWACALLCAP
 Capfactor = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\Capfactor_SWACALLCAP_MAR2019.csv", index_col=0, parse_dates=["Date"])
@@ -365,4 +367,4 @@ for date in Final_Frame.Date.unique():
 
     Sharable_Frame = pd.concat([temp_Final_Frame, Sharable_Frame])
 
-Sharable_Frame.drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_{Price}.csv")
+Sharable_Frame.sort_values(by="Date", ascending=True).drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_{Price}_{Base}.csv")
