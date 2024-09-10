@@ -4,6 +4,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import numpy as np
 import pandasql
 from pandasql import sqldf
+import polars as pl
 
 InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
@@ -96,26 +97,20 @@ Securities_Cutoff_JUNDEC = Securities_Cutoff_JUNDEC.dropna(subset=["stoxxId_Cuto
 Securities_Cutoff = pd.concat([Securities_Cutoff_MARSEP, Securities_Cutoff_JUNDEC])
 
 # Read CSV files for Turnover
-Turnover = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_MARSEP.csv", 
-                    parse_dates=["Date"], dtype={"InfoCode": "int64"})
+Turnover = pl.read_parquet(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Turnover_SID.parquet")
+# Drop unuseful columns
+Turnover = Turnover.drop(["vd", "calcType", "token"])
+# Keep only relevant fields
+Turnover = Turnover.filter(pl.col("field").is_in(["TurnoverRatioFO"]))
 
-Turnover_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_MARSEP_2024.csv", 
-                    parse_dates=["Date"], dtype={"InfoCode": "int64"})
+# Transform the table
+Turnover = Turnover.pivot(
+                values="Turnover_Ratio",
+                index=["Date", "Internal_Number"],
+                on="field"
+                ).rename({"TurnoverRatioFO": "Turnover_Ratio"}).to_pandas()
 
-# Merge the old and new Input
-Turnover = pd.concat([Turnover, Turnover_2024])
-
-Turnover_JUNDEC = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_JUNDEC.csv",
-                    parse_dates=["Date"], dtype={"InfoCode": "int64"})
-
-Turnover_JUNDEC_2024 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Turnover\Output_Turnover_Cutoff_3M_JUNDEC_2024.csv",
-                    parse_dates=["Date"], dtype={"InfoCode": "int64"})
-
-# Merge the old and new Input
-Turnover_JUNDEC = pd.concat([Turnover_JUNDEC, Turnover_JUNDEC_2024])
-
-# Merget the two Frame with Turnover
-Turnover = pd.concat([Turnover, Turnover_JUNDEC]).sort_values(by="Date")
+Turnover["Date"] = pd.to_datetime(Turnover["Date"])
 
 # Define parameters for Turnover
 New = 0.15
@@ -135,8 +130,7 @@ Output = pd.DataFrame()
 Filtered = pd.DataFrame()
 
 # Add Turnover Information
-Input = Input.merge(Turnover[["InfoCode", "Turnover_Ratio", "Date", "Start", "End"]], left_on=["InfoCode", "Date"], 
-                            right_on=["InfoCode", "Date"], how="left")
+Input = Input.merge(Turnover, on=["Date", "Internal_Number"], how="left")
 
 # Set Turnover equal to 0 where NaN
 Input["Turnover_Ratio"] = Input["Turnover_Ratio"].fillna(0)
@@ -153,7 +147,7 @@ Input = Input.merge(FX_Rate, left_on=["Cutoff", "Currency"], right_on=["cutoff_d
 
 # Add information as of Cutoff
 Input = Input.merge(Securities_Cutoff, left_on=["Cutoff", "Internal_Number"], 
-        right_on=["validDate", "stoxxId_Cutoff"], how="left").drop(columns={"validDate", "stoxxId_Cutoff", "currency_Cutoff", "Capfactor_Cutoff", "Start", "End"})
+        right_on=["validDate", "stoxxId_Cutoff"], how="left").drop(columns={"validDate", "stoxxId_Cutoff", "currency_Cutoff", "Capfactor_Cutoff"})
 
 # Calculate Full Market Cap
 Input["Full_Market_Cap_Review"] = Input["Mcap_Units_Index_Currency"] / Input["Free_Float"]
@@ -311,7 +305,7 @@ Output[[
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF"
-]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V" + str(Version) + "_2024.csv")
+]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\V2_Base\Final_Buffer_V" + str(Version) + "_2024.csv")
 
 FOR_Removed[[
     "Date",
@@ -334,4 +328,4 @@ FOR_Removed[[
     "Full_Market_Cap_Cutoff",
     "FOR_FF",
     "Weight"
-]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V" + str(Version) + "_FOR_Removed_Securities_2024.csv")
+]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\V2_Base\Final_Buffer_V" + str(Version) + "_FOR_Removed_Securities_2024.csv")
