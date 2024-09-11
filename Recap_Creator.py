@@ -69,7 +69,9 @@ Sharable_Table = pd.DataFrame(columns=[
                                         "Version",
                                         "Count",
                                         "NotInV20",
-                                        "Total_Weight",
+                                        "In V20, not in New Version",
+                                        "Indian Securities",
+                                        "Indian Securities Weight EOM",
                                         "OneWayTurnover"
                                       ])
 
@@ -83,23 +85,35 @@ SWACALLCAP = pd.concat([MARSEP, JUNDEC]).rename(columns={"Mcap_Units_Index_Curre
 Shared_Client = Shared_Client.merge(SWACALLCAP, left_on=["Date", "internalNumber"], right_on=["Date", "Internal_Number"]).drop(columns={"internalNumber"})
 Shared_Client["Open_Weight"] = Shared_Client["Mcap_Units_Index_Currency_Open"] / Shared_Client["Mcap_Units_Index_Currency_Open"].sum()
 
+# Add close MCAP_UNITS_EOM 2023-DEC
+EOM_SW = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Universe\SWACALLCAP_29122023.csv", parse_dates=["Date"], sep=";").rename(columns={"Mcap_Units_Index_Currency": "Mcap_Units_Index_Currency_EOM"})
+
 for Version in Versions:
     Final_Frame[Version] = Final_Frame[Version].merge(SWACALLCAP, on=["Date", "Internal_Number"], how="left")
     Final_Frame[Version]["Open_Weight"] = Final_Frame[Version]["Mcap_Units_Index_Currency_Open"] / Final_Frame[Version]["Mcap_Units_Index_Currency_Open"].sum()
+
+    Final_Frame[Version] = Final_Frame[Version].merge(EOM_SW[["Internal_Number", "Mcap_Units_Index_Currency_EOM"]], on=["Internal_Number"], how="left")
+    EOM_WEIGHT_FINAL_FRAME = Final_Frame[Version].query("Mcap_Units_Index_Currency_EOM == Mcap_Units_Index_Currency_EOM")
+    EOM_WEIGHT_FINAL_FRAME["EOM_Weight"] = EOM_WEIGHT_FINAL_FRAME["Mcap_Units_Index_Currency_EOM"] / EOM_WEIGHT_FINAL_FRAME["Mcap_Units_Index_Currency_EOM"].sum()
 
     # Create OneWayTurnover Frame
     SupportFrame = Final_Frame[Version][["Date", "Internal_Number", "Open_Weight"]].merge(Shared_Client[["Date", "Internal_Number", "Open_Weight"]], on=["Date", "Internal_Number"], how="outer").rename(columns={"Open_Weight_x":
                                         "Open_Weight", "Open_Weight_y": "Open_Weight_Shared"}).fillna(0)
     
+    SupportFrame["InShared"] = SupportFrame["Internal_Number"].isin(Shared_Client["Internal_Number"])
+    
     OneWayTurnover = abs(SupportFrame["Open_Weight"] - SupportFrame["Open_Weight_Shared"]).sum() / 2
 
-    temp_Sharable_Table = pd.DataFrame({"Version": Version,
-                                        "Count": len(Final_Frame[Version]),
-                                        "NotInV20": [len(Final_Frame[Version][~Final_Frame[Version]["Internal_Number"].isin(Shared_Client["Internal_Number"])])],
-                                        "Total_Weight": [Final_Frame[Version][~Final_Frame[Version]["Internal_Number"].isin(Shared_Client["Internal_Number"])]["Open_Weight"].sum()],
-                                        "OneWayTurnover": OneWayTurnover
-                                      })
-    
+    temp_Sharable_Table = pd.DataFrame({
+        "Version": [Version],
+        "Count": [len(Final_Frame[Version])],
+        "NotInV20": [len(Final_Frame[Version][~Final_Frame[Version]["Internal_Number"].isin(Shared_Client["Internal_Number"])])],
+        "In V20, not in New Version": [len(Shared_Client[~Shared_Client["Internal_Number"].isin(Final_Frame[Version]["Internal_Number"])])],
+        "Indian Securities": [len(Shared_Client[(Shared_Client["Country"] == "IN") & (~Shared_Client["Internal_Number"].isin(Final_Frame[Version]["Internal_Number"]))])],
+        "Indian Securities Weight EOM": [EOM_WEIGHT_FINAL_FRAME[EOM_WEIGHT_FINAL_FRAME["Internal_Number"].str.startswith("IN")]["EOM_Weight"].sum()],
+        "OneWayTurnover": [OneWayTurnover]
+    })
+
     Sharable_Table = pd.concat([Sharable_Table, temp_Sharable_Table])
 
 # Store the result
