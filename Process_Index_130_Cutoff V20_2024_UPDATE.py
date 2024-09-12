@@ -311,7 +311,7 @@ Output[[
     "Free_Float_Market_Cutoff",
     "Full_Market_Cap_Cutoff",
     "FOR_FF"
-]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V" + str(Version) + "_2024.csv")
+]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\V1_Base\Final_Buffer_V" + str(Version) + "_2024.csv")
 
 # Add Full MCAP as of Review
 FOR_Removed["Full_Mcap_Units_Index_Currency"] = FOR_Removed["Shares"] * FOR_Removed["Close_unadjusted_local"] * FOR_Removed["FX_local_to_Index_Currency"]
@@ -332,4 +332,4 @@ FOR_Removed[[
     "Capfactor",
     "FOR_FF",
     "Weight"
-]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Final_Buffer_V" + str(Version) + "_FOR_Removed_Securities_2024.csv")
+]].to_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\V1_Base\Final_Buffer_V" + str(Version) + "_FOR_Removed_Securities_2024.csv")
