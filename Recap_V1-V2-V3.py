@@ -39,5 +39,9 @@ if Store_Excel == True:
 
     with pd.ExcelWriter(Excel_Path) as writer:
             for Version in Versions:
-                Frame[Version].drop(columns={"Capfactor", "Free_Float"}).to_excel(writer, sheet_name=f"{Version}", index=False)
+                try:
+                    Frame[Version].drop(columns={"Capfactor", "Free_Float"}).to_excel(writer, sheet_name=f"{Version}", index=False)
+                except:
+                    Frame[Version].to_excel(writer, sheet_name=f"{Version}", index=False)
+
 
