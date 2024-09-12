@@ -43,5 +43,3 @@ if Store_Excel == True:
                     Frame[Version].drop(columns={"Capfactor", "Free_Float"}).to_excel(writer, sheet_name=f"{Version}", index=False)
                 except:
                     Frame[Version].to_excel(writer, sheet_name=f"{Version}", index=False)
-
-
