@@ -16,7 +16,7 @@ header = {
     "iStudio-User": "lbabbi@qontigo.com"
 }
  
-batch_ids = [18353]
+batch_ids = [18334]
  
 batch_name = 'Output_file'
 
@@ -80,4 +80,4 @@ for date in composition.Date.unique():
 
     Output = pd.concat([temp_Output, Output])
 
-Output.sort_values(by="Date").to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Output\Recap\CN_IN_Recap_V24_18353.csv")
+Output.sort_values(by="Date").to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Output\Recap\CN_IN_Recap_V21_18334.csv")
