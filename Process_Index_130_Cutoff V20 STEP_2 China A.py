@@ -281,19 +281,6 @@ Dates_Frame = Dates_Frame.query("Review >= '2019-03-18'")
 for date in Dates_Frame.Review:
     temp_Input = Input.query("Date == @date")
 
-    # Count removed CHINA A Securities
-    temp_Chinese_Removed = pd.DataFrame({
-                                        "Date": [str(date)],
-                                        "Count_Removed_CN_A": [len(temp_Input[(temp_Input["Country"] == "CN") & (temp_Input[(temp_Input["Currency"] == "CNY")]) & (temp_Input["Instrument_Name"].str.contains("'A'") | temp_Input["Instrument_Name"].str.contains("(CCS)"))])]
-                                        })
-    Chinese_Removed = pd.concat([Chinese_Removed, temp_Chinese_Removed])
-
-    # Remove China A - Securities
-    temp_Input = temp_Input[~((temp_Input["Country"] == "CN") &
-                              (temp_Input[(temp_Input["Currency"] == "CNY")]) &
-                              (temp_Input["Instrument_Name"].str.contains("'A'") | 
-                               temp_Input["Instrument_Name"].str.contains("(CCS)")))]
-
     # Pick the smallest 35% for each Country
     for country in temp_Input.Country.unique():
         country_Input = temp_Input.query("Country == @country")
@@ -304,6 +291,18 @@ for date in Dates_Frame.Review:
         country_Input = country_Input.query("CumulativeWeightCutoff >= (1 - 0.35)")
 
         Output = pd.concat([Output, country_Input])
+
+    if date <= pd.to_datetime("2023-03-20"):
+        # Remove 'A'-CCS from Small Cap Universe
+        Output = Output[
+            ~(
+                (Output["Country"] == "CN") &
+                (Output["Instrument_Name"].str.contains("'A'") | Output["Instrument_Name"].str.contains("(CCS)")) &
+                (Output["Currency"] == "CNY")
+            )
+        ]
+    else:
+        Output = Output.query("Exchange != 'Stock Exchange of Hong Kong - SSE Securities' and Exchange != 'Stock Exchange of Hong Kong - SZSE Securities'")
 
 # Add Source field
 Output["Source"] = "MID Cap Index"
