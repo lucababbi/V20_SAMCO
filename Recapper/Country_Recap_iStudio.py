@@ -16,7 +16,7 @@ header = {
     "iStudio-User": "lbabbi@qontigo.com"
 }
  
-batch_ids = [18334]
+batch_ids = [18353]
  
 batch_name = 'Output_file'
 
@@ -66,7 +66,8 @@ composition = composition[["Date", "Country", "Weight"]]
 Output = pd.DataFrame(columns=[
                                 "Date",
                                 "IN",
-                                "CN"
+                                "CN",
+                                "Total_Components"
                               ])
 
 for date in composition.Date.unique():
@@ -75,9 +76,10 @@ for date in composition.Date.unique():
     temp_Output = pd.DataFrame({
                                 "Date": [date],
                                 "IN": [temp_composition.query("Country == 'IN'")["Weight"].sum()],
-                                "CN": [temp_composition.query("Country == 'CN'")["Weight"].sum()]
+                                "CN": [temp_composition.query("Country == 'CN'")["Weight"].sum()],
+                                "Total_Components": [len(temp_composition)]
                                })
 
     Output = pd.concat([temp_Output, Output])
 
-Output.sort_values(by="Date").to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Output\Recap\CN_IN_Recap_V21_18334.csv")
+Output.sort_values(by="Date").to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Output\Recap\CN_IN_Recap_V21_18353.csv")
