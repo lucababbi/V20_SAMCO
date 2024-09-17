@@ -190,7 +190,7 @@ for date in Dates_Frame["Cutoff"]:
         # Apply Turnover Ratio filter
         temp_Input = temp_Input.query("Turnover_Ratio > @New")
 
-        if date <= pd.to_datetime("2023-03-20"):
+        if date <= pd.to_datetime("2023-02-28"):
             # Remove 'A'-CCS from Small Cap Universe
             temp_Input = temp_Input.query('\
                 ~((Country == "CN") \
@@ -243,7 +243,7 @@ for date in Dates_Frame["Cutoff"]:
         # Apply Turnover Ratio filter
         temp_Input = temp_Input.query("(Prev_Comp == True & Turnover_Ratio > @Old) | (Prev_Comp == False & Turnover_Ratio > @New)")
 
-        if date <= pd.to_datetime("2023-03-20"):
+        if date <= pd.to_datetime("2023-02-28"):
             # Remove 'A'-CCS from Small Cap Universe
             temp_Input = temp_Input.query('\
                 ~((Country == "CN") \

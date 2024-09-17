@@ -11,6 +11,10 @@ from pandasql import sqldf
 Price = "Close"
 FX_Rate_T_1 = False
 Base = "V4"
+Chinese_Removed = pd.DataFrame(columns=[
+                                    "Date",
+                                    "Count_Removed_CN_A"
+                               ])
 
 InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
@@ -277,8 +281,18 @@ Dates_Frame = Dates_Frame.query("Review >= '2019-03-18'")
 for date in Dates_Frame.Review:
     temp_Input = Input.query("Date == @date")
 
+    # Count removed CHINA A Securities
+    temp_Chinese_Removed = pd.DataFrame({
+                                        "Date": [str(date)],
+                                        "Count_Removed_CN_A": [len(temp_Input[(temp_Input["Country"] == "CN") & (temp_Input[(temp_Input["Currency"] == "CNY")]) & (temp_Input["Instrument_Name"].str.contains("'A'") | temp_Input["Instrument_Name"].str.contains("(CCS)"))])]
+                                        })
+    Chinese_Removed = pd.concat([Chinese_Removed, temp_Chinese_Removed])
+
     # Remove China A - Securities
-    temp_Input = temp_Input.query("Exchange != 'Stock Exchange of Hong Kong - SSE Securities' and Exchange != 'Stock Exchange of Hong Kong - SZSE Securities'")
+    temp_Input = temp_Input[~((temp_Input["Country"] == "CN") &
+                              (temp_Input[(temp_Input["Currency"] == "CNY")]) &
+                              (temp_Input["Instrument_Name"].str.contains("'A'") | 
+                               temp_Input["Instrument_Name"].str.contains("(CCS)")))]
 
     # Pick the smallest 35% for each Country
     for country in temp_Input.Country.unique():
@@ -449,3 +463,5 @@ for date in Final_Frame.Date.unique():
     Sharable_Frame = pd.concat([temp_Final_Frame, Sharable_Frame])
 
 Sharable_Frame.sort_values(by="Date", ascending=True).drop(columns={"InfoCode", "Free_Float_Market_Cutoff", "Full_Market_Cap_Cutoff", "FOR_FF", "Source"}).to_csv(rf"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\{Price}\2024\{Base}\Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_{Price}_{Base}.csv")
+
+print(Chinese_Removed)
