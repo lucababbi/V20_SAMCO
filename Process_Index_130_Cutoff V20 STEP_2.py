@@ -10,7 +10,7 @@ from pandasql import sqldf
 # ================================================
 Price = "Close"
 FX_Rate_T_1 = False
-Base = "V3"
+Base = "V1"
 
 InfoCode = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\InfoCode.csv", parse_dates=["vf", "vt"])
 # Deal with 99991230 dates with a date in remote future
