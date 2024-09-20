@@ -10,7 +10,7 @@ from pandasql import sqldf
 # ================================================
 Price = "Close"
 FX_Rate_T_1 = False
-Base = "V4"
+Base = "V5"
 Chinese_Removed = pd.DataFrame(columns=[
                                     "Date",
                                     "Count_Removed_CN_A"

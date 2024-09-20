@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from datetime import datetime
 
-Versions = ["V3"]
+Versions = ["V5"]
 Price = "Close"
 
 Path = r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output"

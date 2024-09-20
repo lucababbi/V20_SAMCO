@@ -123,6 +123,7 @@ Old = 0.10
 # Define parameter for Market Cap
 Threshold = 0.99
 Threshold_Korea = 0.65
+Threshold_China = 0.65
 
 # Parameter for FOR
 Threshold_FOR = 0.15
