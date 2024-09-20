@@ -16,7 +16,7 @@ header = {
     "iStudio-User": "lbabbi@qontigo.com"
 }
  
-batch_ids = [18353]
+batch_ids = [18450]
  
 batch_name = 'Output_file'
 
@@ -61,25 +61,34 @@ composition = composition.rename(columns={"close_day": "Date","index_symbol": "I
 })
 
 # Remove unuseful columns
-composition = composition[["Date", "Country", "Weight"]]
+composition = composition[["Date", "Country", "Weight"]].query("Country != 'None'")
+Unique_Countries = composition.Country.unique()
 
-Output = pd.DataFrame(columns=[
-                                "Date",
-                                "IN",
-                                "CN",
-                                "Total_Components"
-                              ])
+Output = pd.DataFrame(columns=["Date"] + list(Unique_Countries) + ["Total_Components"])
 
-for date in composition.Date.unique():
+countries = ['CZ', 'IN', 'CN', 'KR', 'TW', 'ZA', 'RU', 'PH', 'PK', 'ID', 'MY', 'BR', 
+                'TH', 'TR', 'MX', 'PL', 'EG', 'CL', 'GR', 'HU', 'CO', 'QA', 'SA', 'KW', 'AE']
+
+for date in composition.Date.sort_values().unique():
+
     temp_composition = composition.query("Date == @date")
 
-    temp_Output = pd.DataFrame({
-                                "Date": [date],
-                                "IN": [temp_composition.query("Country == 'IN'")["Weight"].sum()],
-                                "CN": [temp_composition.query("Country == 'CN'")["Weight"].sum()],
-                                "Total_Components": [len(temp_composition)]
-                               })
+    # Create a dictionary to store the data for each country
+    country_data = {"Date": [date]}
+
+    # Loop through each country and calculate the sum of the "Weight" for that country
+    for country in countries:
+        country_data[country] = [temp_composition.query(f"Country == '{country}'")["Weight"].sum()]
+
+    # Add the Total_Components field
+    country_data["Total_Components"] = [len(temp_composition)]
+
+    # Create the DataFrame using the constructed dictionary
+    temp_Output = pd.DataFrame(country_data)
 
     Output = pd.concat([temp_Output, Output])
+
+Output = Output.sort_values(by="Date") # Adjust the date order
+Output = Output.T
 
 Output.sort_values(by="Date").to_csv(r"C:\Users\et246\Desktop\V20_SAMCO\Output\Recap\CN_IN_Recap_V21_18353.csv")
