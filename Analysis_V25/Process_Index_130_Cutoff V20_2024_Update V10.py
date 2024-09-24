@@ -2,9 +2,9 @@ import pandas as pd
 from datetime import datetime
 import os
 
-Version = "V9"
+Version = "V10"
 Step_2 = True
-Capping = 0.10
+Capping = 0.075
 
 # Read V25 Composition
 V25 = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\V20_SAMCO\Output\Close\2024\V5\Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_Close_V5.csv",
@@ -16,7 +16,7 @@ CapFactor = pd.read_csv(r"C:\Users\lbabbi\OneDrive - ISS\Desktop\Projects\SAMCO\
 # Create weightFactor
 V25["weightFactor"] = 1
 
-Output = pd.DataFrame(columns=["Date", "CapFactor_Adjustment"])
+Output = pd.DataFrame(columns=["Date", "CapFactor_Adjustment"]) 
 
 for date in V25.Date.unique():
     temp_V25 = V25.query("Date == @date")
