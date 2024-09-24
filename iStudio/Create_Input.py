@@ -20,14 +20,17 @@ for Version in Versions:
 
         if Version == "V1":
             CSV = os.path.join(Path, Price, "2024", Version, "Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_Close_V1.csv")
+
         elif Version == "V8": # Version 8 is based on Version 5 but with adjustment for CapFactor
             Version = "V5"
             CSV = os.path.join(Path, Price, "2024", Version, "Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_Close_" + Version + ".csv")
             Version = "V8"
+            
         elif Version == "V9": # Version 8 is based on Version 5 but with adjustment for CapFactor
             Version = "V1"
             CSV = os.path.join(Path, Price, "2024", Version, "Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_Close_" + Version + ".csv")
             Version = "V9"
+
         else:
             CSV = os.path.join(Path, Price, "2024", Version, "Sharable_Final_Buffer_V20_Cutoff_Mcap_Enhanced_STEP2_Close_" + Version + ".csv")
 
